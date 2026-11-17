@@ -12,7 +12,7 @@ cd "$SCRIPT_DIR"
 
 APP_NAME="iPhone Extended Display"
 APP_BUNDLE="${APP_NAME}.app"
-DMG_NAME="iPhoneExtendedDisplay-1.0.0.dmg"
+DMG_NAME="iPhoneExtendedDisplay-1.0.1.dmg"
 VOL_NAME="iPhone Extended Display"
 STAGING_DIR="./dist_dmg"
 
