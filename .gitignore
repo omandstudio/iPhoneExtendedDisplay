@@ -1,0 +1,34 @@
+# macOS System Files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Xcode & Swift Build Artifacts
+.build/
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcbkptlist
+*.hmap
+*.swiftdoc
+*.swiftmodule
+*.swiftinterface
+*.swiftsourceinfo
+*.dSYM/
+
+# Temporary / Cache Files
+*.tmp
+*.log
+/tmp/
+module-cache/
+.swiftpm/
+
+# User Local Configs
+.env
+*.local
+
