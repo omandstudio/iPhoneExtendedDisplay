@@ -72,7 +72,15 @@ Aplikasi standar native macOS profesional untuk menjadikan **iPhone dan iPad** s
 
 ## 📥 Panduan Instalasi
 
-### Metode 1: Menjalankan Aplikasi Jadi (.app)
+### Metode 1: Menggunakan Installer .DMG (Paling Mudah & Tanpa Terminal ⭐)
+1. Unduh file installer **`iPhoneExtendedDisplay-1.0.0.dmg`** dari halaman **[GitHub Releases](https://github.com/omandistudio/iPhoneExtendedDisplay/releases)**.
+2. Klik dua kali (**Double-click**) file `.dmg` yang telah diunduh.
+3. Seret (*Drag & Drop*) ikon **`iPhone Extended Display`** ke dalam folder **`Applications`**.
+4. Buka aplikasi langsung dari folder **Applications** atau via **Launchpad/Spotlight**.
+
+---
+
+### Metode 2: Menggunakan Clone Repositori Langsung (.app)
 1. Unduh atau clone repositori ini ke Mac Anda:
    ```bash
    git clone https://github.com/omandistudio/iPhoneExtendedDisplay.git
@@ -85,15 +93,16 @@ Aplikasi standar native macOS profesional untuk menjadikan **iPhone dan iPad** s
 
 ---
 
-### Metode 2: Kompilasi Mandiri dari Source Code (build.sh)
+### Metode 3: Kompilasi Mandiri dari Source Code (build.sh & package-dmg.sh)
 Bagi pengembang yang ingin memodifikasi atau mengompilasi ulang source code sendiri:
 1. Pastikan Command Line Tools Xcode telah terpasang di Mac Anda (`xcode-select --install`).
 2. Jalankan skrip build otomatis yang disediakan:
    ```bash
-   chmod +x build.sh
-   ./build.sh
+   chmod +x build.sh package-dmg.sh
+   ./build.sh          # Kompilasi kode sumber Swift menjadi .app bundle
+   ./package-dmg.sh    # Membungkus .app bundle menjadi installer .dmg mandiri
    ```
-3. Skrip ini akan mengompilasi seluruh modul Swift native, membundel aset ke dalam `iPhone Extended Display.app`, dan melakukan ad-hoc code signing secara otomatis.
+3. Skrip ini akan mengompilasi seluruh modul Swift native, membundel aset ke dalam `iPhone Extended Display.app`, dan membuat file installer `iPhoneExtendedDisplay-1.0.0.dmg`.
 
 ---
 

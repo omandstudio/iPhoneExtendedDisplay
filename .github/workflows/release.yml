@@ -1,0 +1,36 @@
+name: Build & Release DMG
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: macos-13
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Compile macOS Application
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
+      - name: Package into DMG Installer
+        run: |
+          chmod +x package-dmg.sh
+          ./package-dmg.sh
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: iPhoneExtendedDisplay-*.dmg
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
