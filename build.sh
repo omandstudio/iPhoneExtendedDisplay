@@ -2,7 +2,7 @@
 # ==============================================================================
 # iPhone Extended Display - Automated Build Script
 # Author: YoiKut.com (https://yoikut.com)
-# Repository: https://github.com/omandistudio/iPhoneExtendedDisplay
+# Repository: https://github.com/omandstudio/iPhoneExtendedDisplay
 # ==============================================================================
 
 set -e
@@ -19,7 +19,7 @@ RESOURCES_DIR="${CONTENTS_DIR}/Resources"
 echo "=========================================================="
 echo "  🛠️  Building ${APP_NAME} for macOS"
 echo "  Author: YoiKut.com"
-echo "  Repo: omandistudio/iPhoneExtendedDisplay"
+echo "  Repo: omandstudio/iPhoneExtendedDisplay"
 echo "=========================================================="
 
 # Create App bundle structure

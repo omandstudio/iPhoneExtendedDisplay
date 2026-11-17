@@ -1,6 +1,6 @@
 # Panduan Kontribusi (Contributing Guide)
 
-Terima kasih atas ketertarikan Anda untuk berkontribusi pada **iPhone Extended Display**! Proyek open-source ini dikembangkan dan dikelola oleh **[YoiKut.com](https://yoikut.com)** di repositori **[omandistudio/iPhoneExtendedDisplay](https://github.com/omandistudio/iPhoneExtendedDisplay)**.
+Terima kasih atas ketertarikan Anda untuk berkontribusi pada **iPhone Extended Display**! Proyek open-source ini dikembangkan dan dikelola oleh **[YoiKut.com](https://yoikut.com)** di repositori **[omandstudio/iPhoneExtendedDisplay](https://github.com/omandstudio/iPhoneExtendedDisplay)**.
 
 ---
 
@@ -26,7 +26,7 @@ Terima kasih atas ketertarikan Anda untuk berkontribusi pada **iPhone Extended D
    ```
 5. **Push ke GitHub & Buat Pull Request (PR)**:
    - Kirimkan branch Anda ke GitHub fork Anda.
-   - Buka Pull Request ke branch `main` repositori resmi `omandistudio/iPhoneExtendedDisplay`.
+   - Buka Pull Request ke branch `main` repositori resmi `omandstudio/iPhoneExtendedDisplay`.
    - Jelaskan secara detail masalah yang diselesaikan atau fitur baru yang ditambahkan.
 
 ---
@@ -34,7 +34,7 @@ Terima kasih atas ketertarikan Anda untuk berkontribusi pada **iPhone Extended D
 ## 🐞 Melaporkan Bug atau Masukan Fitur
 
 Jika Anda menemukan kendala atau memiliki ide fitur baru:
-- Periksa daftar [GitHub Issues](https://github.com/omandistudio/iPhoneExtendedDisplay/issues) terlebih dahulu untuk memastikan topik belum pernah dilaporkan.
+- Periksa daftar [GitHub Issues](https://github.com/omandstudio/iPhoneExtendedDisplay/issues) terlebih dahulu untuk memastikan topik belum pernah dilaporkan.
 - Gunakan template **Bug Report** atau **Feature Request** yang tersedia saat membuat issue baru.
 - Sertakan versi macOS, model iPhone, versi iOS, dan log error yang relevan.
 

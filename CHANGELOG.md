@@ -9,7 +9,7 @@ Format changelog ini mengacu pada [Keep a Changelog](https://keepachangelog.com/
 ## [1.0.0] - 2026-11-17
 
 ### 🎉 Rilis Perdana (Initial Release)
-Rilis publik pertama dari **iPhone Extended Display** oleh **YoiKut.com** ([omandistudio/iPhoneExtendedDisplay](https://github.com/omandistudio/iPhoneExtendedDisplay)).
+Rilis publik pertama dari **iPhone Extended Display** oleh **YoiKut.com** ([omandstudio/iPhoneExtendedDisplay](https://github.com/omandstudio/iPhoneExtendedDisplay)).
 
 ### ✨ Fitur Baru
 - **Native macOS Control Window**:
@@ -42,6 +42,10 @@ Rilis publik pertama dari **iPhone Extended Display** oleh **YoiKut.com** ([oman
   - Simulasi kursor dan event klik native macOS via `CGEvent`.
 
 - **Standard GitHub & Developer Tools**:
+  - **Standalone .DMG Drag-and-Drop Installer**:
+    - Penyediaan installer mandiri berekstensi **`.dmg`** (`iPhoneExtendedDisplay-1.0.0.dmg`) dengan tautan pintasan ke folder `/Applications` untuk instalasi grafis cepat tanpa Terminal.
+    - Skrip pengemasan lokal `package-dmg.sh` memanfaatkan utilitas native macOS `hdiutil`.
+    - Otomasi CI/CD **GitHub Actions** (`.github/workflows/release.yml`) untuk kompilasi cloud dan publikasi otomatis aset `.dmg` ke GitHub Releases saat membuat tag versi.
   - Skrip build otomatis `build.sh` untuk kompilasi dan pembuatan bundle `.app` mandiri.
   - Peluncur 1-klik `Start-iPhoneExtendedDisplay.command` untuk pengguna non-teknis.
   - Template isu GitHub (Bug Report & Feature Request).

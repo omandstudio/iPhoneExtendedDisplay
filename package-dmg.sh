@@ -2,7 +2,7 @@
 # ==============================================================================
 # iPhone Extended Display - DMG Packaging Script
 # Author: YoiKut.com (https://yoikut.com)
-# Repository: https://github.com/omandistudio/iPhoneExtendedDisplay
+# Repository: https://github.com/omandstudio/iPhoneExtendedDisplay
 # ==============================================================================
 
 set -e

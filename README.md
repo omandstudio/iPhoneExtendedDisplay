@@ -2,14 +2,14 @@
 
 [![macOS](https://img.shields.io/badge/macOS-12.0%2B-black?logo=apple)](https://apple.com)
 [![iOS](https://img.shields.io/badge/iOS-12.0%2B-blue?logo=apple)](https://apple.com)
-[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/omandistudio/iPhoneExtendedDisplay)
+[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/omandstudio/iPhoneExtendedDisplay)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Author](https://img.shields.io/badge/author-YoiKut.com-orange.svg)](https://yoikut.com)
 
 Aplikasi standar native macOS profesional untuk menjadikan **iPhone dan iPad** sebagai **Monitor Tambahan (Extended Display)** atau **Duplikasi Layar (Mirror Display)** bagi Mac Anda, baik melalui **Kabel USB (Latensi Nol)** maupun **Nirkabel (Wi-Fi)**, tanpa batasan perangkat keras Apple Sidecar.
 
 > Dikembangkan & dikelola secara resmi oleh **[YoiKut.com](https://yoikut.com)**  
-> Repositori GitHub: **[omandistudio/iPhoneExtendedDisplay](https://github.com/omandistudio/iPhoneExtendedDisplay)**
+> Repositori GitHub: **[omandstudio/iPhoneExtendedDisplay](https://github.com/omandstudio/iPhoneExtendedDisplay)**
 
 ---
 
@@ -17,8 +17,9 @@ Aplikasi standar native macOS profesional untuk menjadikan **iPhone dan iPad** s
 - [✨ Fitur Unggulan](#-fitur-unggulan)
 - [💻 Kebutuhan Sistem](#-kebutuhan-sistem)
 - [📥 Panduan Instalasi](#-panduan-instalasi)
-  - [Metode 1: Menjalankan Aplikasi Jadi (.app)](#metode-1-menjalankan-aplikasi-jadi-app)
-  - [Metode 2: Kompilasi Mandiri dari Source Code (build.sh)](#metode-2-kompilasi-mandiri-dari-source-code-buildsh)
+  - [Metode 1: Menggunakan Installer .DMG (Paling Mudah & Tanpa Terminal ⭐)](#metode-1-menggunakan-installer-dmg-paling-mudah--tanpa-terminal-)
+  - [Metode 2: Menggunakan Clone Repositori Langsung (.app)](#metode-2-menggunakan-clone-repositori-langsung-app)
+  - [Metode 3: Kompilasi Mandiri dari Source Code (build.sh & package-dmg.sh)](#metode-3-kompilasi-mandiri-dari-source-code-buildsh--package-dmgsh)
 - [🔒 Pengaturan Izin macOS (Wajib)](#-pengaturan-izin-macos-wajib)
 - [📱 Panduan Penggunaan](#-panduan-penggunaan)
   - [1. Menggunakan Kabel USB (Rekomendasi - Latensi Nol)](#1-menggunakan-kabel-usb-rekomendasi---latensi-nol)
@@ -73,7 +74,7 @@ Aplikasi standar native macOS profesional untuk menjadikan **iPhone dan iPad** s
 ## 📥 Panduan Instalasi
 
 ### Metode 1: Menggunakan Installer .DMG (Paling Mudah & Tanpa Terminal ⭐)
-1. Unduh file installer **`iPhoneExtendedDisplay-1.0.0.dmg`** dari halaman **[GitHub Releases](https://github.com/omandistudio/iPhoneExtendedDisplay/releases)**.
+1. Unduh file installer **`iPhoneExtendedDisplay-1.0.0.dmg`** dari halaman **[GitHub Releases](https://github.com/omandstudio/iPhoneExtendedDisplay/releases)**.
 2. Klik dua kali (**Double-click**) file `.dmg` yang telah diunduh.
 3. Seret (*Drag & Drop*) ikon **`iPhone Extended Display`** ke dalam folder **`Applications`**.
 4. Buka aplikasi langsung dari folder **Applications** atau via **Launchpad/Spotlight**.
@@ -83,7 +84,7 @@ Aplikasi standar native macOS profesional untuk menjadikan **iPhone dan iPad** s
 ### Metode 2: Menggunakan Clone Repositori Langsung (.app)
 1. Unduh atau clone repositori ini ke Mac Anda:
    ```bash
-   git clone https://github.com/omandistudio/iPhoneExtendedDisplay.git
+   git clone https://github.com/omandstudio/iPhoneExtendedDisplay.git
    cd iPhoneExtendedDisplay
    ```
 2. Anda dapat langsung membuka aplikasi bundle:
@@ -201,6 +202,8 @@ kill -9 <PID_PROSES>
 ```text
 iPhoneExtendedDisplay/
 ├── .github/
+│   ├── workflows/
+│   │   └── release.yml                 # CI/CD Otomasi Pembuatan & Rilis Installer .DMG
 │   └── ISSUE_TEMPLATE/
 │       ├── bug_report.md               # Template Laporan Bug
 │       └── feature_request.md          # Template Permintaan Fitur
@@ -221,6 +224,7 @@ iPhoneExtendedDisplay/
 ├── Shared/                             # Shared Binary Protocol
 ├── .gitignore                          # Standard macOS & Swift Git Ignore
 ├── build.sh                            # Skrip Kompilasi Otomatis macOS App
+├── package-dmg.sh                      # 📦 Skrip Pembuat Installer .DMG Mandiri
 ├── Start-iPhoneExtendedDisplay.command # Peluncur 1-Klik macOS Finder
 ├── CHANGELOG.md                        # Catatan Rilis & Riwayat Perubahan
 ├── CONTRIBUTING.md                     # Panduan Kontribusi Komunitas
@@ -236,4 +240,4 @@ Proyek ini dilisensikan di bawah **[MIT License](LICENSE)**.
 
 Hak Cipta © 2026 **[YoiKut.com](https://yoikut.com)**.
 
-Jika proyek ini bermanfaat bagi produktivitas kerja Anda, dukung pengembangannya dengan memberikan bintang (⭐ Star) pada repositori **[omandistudio/iPhoneExtendedDisplay](https://github.com/omandistudio/iPhoneExtendedDisplay)**!
+Jika proyek ini bermanfaat bagi produktivitas kerja Anda, dukung pengembangannya dengan memberikan bintang (⭐ Star) pada repositori **[omandstudio/iPhoneExtendedDisplay](https://github.com/omandstudio/iPhoneExtendedDisplay)**!

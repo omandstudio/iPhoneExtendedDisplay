@@ -23,7 +23,7 @@ public class ExtendedDisplayService: NetworkServerDelegate, H264EncoderDelegate,
     
     public func start() {
         print("==================================================")
-        print("🚀 iPhone Extended Display (by omandistudio)")
+        print("🚀 iPhone Extended Display (by omandstudio)")
         print("==================================================")
         
         let webPort: UInt16 = 8080

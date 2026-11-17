@@ -247,14 +247,14 @@ public struct ControlWindowView: View {
             // MARK: - Footer
             HStack {
                 Button(action: {
-                    if let url = URL(string: "https://github.com/omandistudio/iPhoneExtendedDisplay") {
+                    if let url = URL(string: "https://github.com/omandstudio/iPhoneExtendedDisplay") {
                         NSWorkspace.shared.open(url)
                     }
                 }) {
                     HStack(spacing: 5) {
                         Image(systemName: "link")
                             .font(.system(size: 10))
-                        Text("omandistudio/iPhoneExtendedDisplay")
+                        Text("omandstudio/iPhoneExtendedDisplay")
                             .font(.system(size: 11, weight: .medium))
                             .foregroundColor(.accentColor)
                     }

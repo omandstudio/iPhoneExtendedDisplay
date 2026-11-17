@@ -6,7 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
 echo "=================================================="
-echo "🚀 Memulai iPhone Extended Display (omandistudio)..."
+echo "🚀 Memulai iPhone Extended Display (omandstudio)..."
 echo "=================================================="
 
 # Jalankan aplikasi native GUI
