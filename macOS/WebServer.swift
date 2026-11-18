@@ -91,6 +91,26 @@ public class WebServer {
     }
     
     private func serveHttpPage(connection: NWConnection, request: String) {
+        let firstLine = request.components(separatedBy: "\r\n").first ?? ""
+        
+        // Serve Web Icon & Favicon for iOS Safari Bookmarks / Add to Home Screen
+        if firstLine.contains("favicon") || firstLine.contains("apple-touch-icon") || firstLine.contains("icon.png") {
+            let iconData = WebIcon.data
+            let header = "HTTP/1.1 200 OK\r\n" +
+                "Content-Type: image/png\r\n" +
+                "Content-Length: \(iconData.count)\r\n" +
+                "Connection: close\r\n" +
+                "Cache-Control: public, max-age=604800\r\n\r\n"
+            
+            var fullData = header.data(using: .utf8) ?? Data()
+            fullData.append(iconData)
+            
+            connection.send(content: fullData, completion: .contentProcessed({ _ in
+                connection.cancel()
+            }))
+            return
+        }
+        
         let html = WebClientHTML.content
         let response = "HTTP/1.1 200 OK\r\n" +
             "Content-Type: text/html; charset=utf-8\r\n" +

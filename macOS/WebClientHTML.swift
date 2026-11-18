@@ -9,8 +9,14 @@ public struct WebClientHTML {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="OpenScreen">
-    <title>iPhone Extended Display - iPhone Monitor</title>
+    <meta name="apple-mobile-web-app-title" content="iPhone Display">
+    <title>iPhone Extended Display</title>
+
+    <!-- Favicon & Apple Touch Home Screen Icon -->
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png">
     <style>
         * {
             box-sizing: border-box;

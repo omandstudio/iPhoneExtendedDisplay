@@ -72,6 +72,7 @@ swiftc \
     macOS/ExtendedDisplayService.swift \
     macOS/WebServer.swift \
     macOS/WebClientHTML.swift \
+    macOS/WebIcon.swift \
     macOS/ScreenCaptureManager.swift \
     macOS/VirtualDisplayManager.swift \
     macOS/InputInjector.swift \
