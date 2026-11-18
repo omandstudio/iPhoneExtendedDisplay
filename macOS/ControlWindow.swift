@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import ServiceManagement
 
 public class AppState: ObservableObject {
     public static let shared = AppState()
@@ -15,29 +16,70 @@ public class AppState: ObservableObject {
     @Published public var usbIP: String = "192.168.2.1"
     @Published public var wifiIP: String = "192.168.0.183"
     @Published public var hasScreenPermission: Bool = true
+    @Published public var launchAtLogin: Bool = false
+    
+    public var onToggleServer: (() -> Void)?
+    public var onQuitApp: (() -> Void)?
     
     public init() {
         refreshIPs()
         checkPermission()
+        checkLaunchAtLogin()
     }
     
     public func checkPermission() {
         self.hasScreenPermission = CGPreflightScreenCaptureAccess()
     }
     
+    public func checkLaunchAtLogin() {
+        if #available(macOS 13.0, *) {
+            self.launchAtLogin = (SMAppService.mainApp.status == .enabled)
+        } else {
+            let script = "tell application \"System Events\" to get name of every login item"
+            if let output = NSAppleScript(source: script)?.executeAndReturnError(nil).stringValue {
+                self.launchAtLogin = output.contains("iPhone Extended Display")
+            }
+        }
+    }
+    
+    public func setLaunchAtLogin(_ enable: Bool) {
+        if #available(macOS 13.0, *) {
+            do {
+                if enable {
+                    try SMAppService.mainApp.register()
+                } else {
+                    try SMAppService.mainApp.unregister()
+                }
+            } catch {
+                fallbackSetLoginItem(enable)
+            }
+        } else {
+            fallbackSetLoginItem(enable)
+        }
+        self.launchAtLogin = enable
+    }
+    
+    private func fallbackSetLoginItem(_ enable: Bool) {
+        if enable {
+            let appPath = Bundle.main.bundlePath
+            let script = "tell application \"System Events\" to make login item at end with properties {path:\"\(appPath)\", hidden:false, name:\"iPhone Extended Display\"}"
+            NSAppleScript(source: script)?.executeAndReturnError(nil)
+        } else {
+            let script = "tell application \"System Events\" to delete (every login item whose name is \"iPhone Extended Display\")"
+            NSAppleScript(source: script)?.executeAndReturnError(nil)
+        }
+    }
+    
     public func refreshIPs() {
-        // Find active IPv4 interfaces
         var ifaddr: UnsafeMutablePointer<ifaddrs>?
         guard getifaddrs(&ifaddr) == 0, let firstAddr = ifaddr else { return }
         
-        var foundUsb = false
         var foundWifi = false
         
         for ptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
             let flags = Int32(ptr.pointee.ifa_flags)
             let addr = ptr.pointee.ifa_addr.pointee
             
-            // Look for IPv4 addresses
             if (flags & (IFF_UP|IFF_RUNNING)) != 0 && addr.sa_family == UInt8(AF_INET) {
                 var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
                 if getnameinfo(ptr.pointee.ifa_addr, socklen_t(addr.sa_len), &hostname, socklen_t(hostname.count), nil, 0, NI_NUMERICHOST) == 0 {
@@ -47,7 +89,6 @@ public class AppState: ObservableObject {
                     if ipStr != "127.0.0.1" {
                         if name.starts(with: "bridge") || ipStr.starts(with: "192.168.2.") {
                             self.usbIP = ipStr
-                            foundUsb = true
                         } else if name.starts(with: "en") && !foundWifi {
                             self.wifiIP = ipStr
                             foundWifi = true
@@ -70,19 +111,29 @@ public struct ControlWindowView: View {
         VStack(spacing: 0) {
             // MARK: - Header
             HStack(spacing: 14) {
-                ZStack {
-                    LinearGradient(
-                        colors: [Color.blue, Color.purple],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    .frame(width: 48, height: 48)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .shadow(color: Color.blue.opacity(0.3), radius: 6, x: 0, y: 3)
-                    
-                    Image(systemName: "iphone.and.arrow.forward")
-                        .font(.system(size: 22, weight: .semibold))
-                        .foregroundColor(.white)
+                // App Icon Display
+                if let iconPath = Bundle.main.path(forResource: "AppIcon", ofType: "icns"),
+                   let appIcon = NSImage(contentsOfFile: iconPath) {
+                    Image(nsImage: appIcon)
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+                        .shadow(color: Color.black.opacity(0.18), radius: 5, x: 0, y: 2)
+                } else {
+                    ZStack {
+                        LinearGradient(
+                            colors: [Color.blue, Color.purple],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        .frame(width: 48, height: 48)
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .shadow(color: Color.blue.opacity(0.3), radius: 6, x: 0, y: 3)
+                        
+                        Image(systemName: "display.2")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
                 }
                 
                 VStack(alignment: .leading, spacing: 3) {
@@ -100,10 +151,10 @@ public struct ControlWindowView: View {
                     
                     HStack(spacing: 6) {
                         Circle()
-                            .fill(state.isDeviceConnected ? Color.green : Color.orange)
+                            .fill(!state.isServerRunning ? Color.gray : (state.isDeviceConnected ? Color.green : Color.orange))
                             .frame(width: 8, height: 8)
                         
-                        Text(state.isDeviceConnected ? "Terhubung ke \(state.connectedDeviceName)" : "Server Aktif • Menunggu Koneksi")
+                        Text(!state.isServerRunning ? "Layanan Dihentikan (Nonaktif)" : (state.isDeviceConnected ? "Terhubung ke \(state.connectedDeviceName)" : "Server Aktif • Menunggu Koneksi"))
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
                     }
@@ -199,7 +250,7 @@ public struct ControlWindowView: View {
                         .cornerRadius(8)
                     }
                     
-                    // 2. Settings Group
+                    // 2. Display Settings Group
                     VStack(alignment: .leading, spacing: 12) {
                         Text("PENGATURAN DISPLAY")
                             .font(.system(size: 10, weight: .bold))
@@ -229,6 +280,84 @@ public struct ControlWindowView: View {
                             }
                             .pickerStyle(.segmented)
                             .frame(width: 220)
+                        }
+                    }
+                    .padding(14)
+                    .background(Color.secondary.opacity(0.04))
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.secondary.opacity(0.12), lineWidth: 1)
+                    )
+                    
+                    // 3. System & Startup Settings
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("PENGATURAN SISTEM & STARTUP")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.secondary)
+                        
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Buka Otomatis saat Mac Dinyalakan:")
+                                    .font(.system(size: 12, weight: .medium))
+                                Text(state.launchAtLogin ? "Aktif • Aplikasi otomatis berjalan saat Anda login." : "Nonaktif (Rekomendasi) • Hanya berjalan saat Anda membukanya.")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Toggle("", isOn: Binding(
+                                get: { state.launchAtLogin },
+                                set: { state.setLaunchAtLogin($0) }
+                            ))
+                            .toggleStyle(.switch)
+                        }
+                    }
+                    .padding(14)
+                    .background(Color.secondary.opacity(0.04))
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.secondary.opacity(0.12), lineWidth: 1)
+                    )
+                    
+                    // 4. Application Control & Power Management
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("KONTROL STATUS APLIKASI")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.secondary)
+                        
+                        HStack(spacing: 12) {
+                            // Pause / Resume Server Button
+                            Button(action: {
+                                state.onToggleServer?()
+                            }) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: state.isServerRunning ? "pause.fill" : "play.fill")
+                                    Text(state.isServerRunning ? "Jeda Layanan" : "Aktifkan Layanan")
+                                }
+                                .frame(maxWidth: .infinity)
+                            }
+                            .controlSize(.regular)
+                            
+                            // Turn Off / Quit Application Button
+                            Button(action: {
+                                if let quit = state.onQuitApp {
+                                    quit()
+                                } else {
+                                    NSApp.terminate(nil)
+                                }
+                            }) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "power")
+                                    Text("Matikan & Keluar Aplikasi")
+                                }
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 6)
+                                .background(Color.red.opacity(0.9))
+                                .cornerRadius(6)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                     .padding(14)
@@ -280,7 +409,7 @@ public struct ControlWindowView: View {
             .padding(.vertical, 12)
             .background(Color(NSColor.windowBackgroundColor))
         }
-        .frame(width: 520, height: 420)
+        .frame(width: 530, height: 500)
     }
     
     private func copyToClipboard(_ text: String) {

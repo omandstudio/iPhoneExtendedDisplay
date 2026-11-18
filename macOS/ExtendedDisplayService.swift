@@ -28,6 +28,7 @@ public class ExtendedDisplayService: NetworkServerDelegate, H264EncoderDelegate,
         
         let webPort: UInt16 = 8080
         AppState.shared.port = webPort
+        AppState.shared.isServerRunning = true
         
         // 1. Start Native TCP Listener (port 7789)
         _ = server.start(port: 7789)
@@ -40,6 +41,20 @@ public class ExtendedDisplayService: NetworkServerDelegate, H264EncoderDelegate,
         print("   👉 Kabel USB : http://\(AppState.shared.usbIP):\(webPort)")
         print("   👉 Wi-Fi    : http://\(AppState.shared.wifiIP):\(webPort)")
         print("==================================================")
+    }
+    
+    public func stop() {
+        print("[Service] 🛑 Stopping Extended Display Service...")
+        screenCaptureManager.stopCapture()
+        virtualDisplayManager.destroyDisplay()
+        server.stop()
+        webServer.stop()
+        isStreaming = false
+        DispatchQueue.main.async {
+            AppState.shared.isServerRunning = false
+            AppState.shared.isDeviceConnected = false
+            AppState.shared.connectedDeviceName = "Layanan Dimatikan"
+        }
     }
     
     // MARK: - WebServerDelegate (iPhone Safari)
