@@ -141,7 +141,7 @@ public struct ControlWindowView: View {
                         Text("iPhone Extended Display")
                             .font(.system(size: 16, weight: .bold))
                         
-                        Text("v1.0.1")
+                        Text("v1.0.2")
                             .font(.system(size: 10, weight: .medium))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)

@@ -2,7 +2,7 @@
 
 [![macOS](https://img.shields.io/badge/macOS-12.0%2B-black?logo=apple)](https://apple.com)
 [![iOS](https://img.shields.io/badge/iOS-12.0%2B-blue?logo=apple)](https://apple.com)
-[![Version](https://img.shields.io/badge/version-1.0.1-green.svg)](https://github.com/omandstudio/iPhoneExtendedDisplay)
+[![Version](https://img.shields.io/badge/version-1.0.2-green.svg)](https://github.com/omandstudio/iPhoneExtendedDisplay)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Author](https://img.shields.io/badge/author-YoiKut.com-orange.svg)](https://yoikut.com)
 
@@ -45,7 +45,10 @@ Developed and maintained by **[YoiKut.com](https://yoikut.com)**.
 
 ## Key Features
 
+- **Official macOS-to-iPhone Connected App Icon**: Features a custom high-resolution Apple-style squircle icon (`AppIcon.icns`) depicting a Mac display connected with an iPhone through a radiant display energy stream.
 - **Native macOS Control Window**: Lightweight and responsive interface built with SwiftUI and AppKit to monitor server status in real time, view active network interfaces, copy access URLs, and toggle frame rates.
+- **Power & Startup Management**: Built-in toggle to manage Launch at Startup (disabled by default for energy and resource efficiency), plus an instant "Quit Application" button in the popup window and graceful shutdown upon closing the window.
+- **Smart Process Launcher (`Start-iPhoneExtendedDisplay.command`)**: Automatically detects if the application is already running, providing an interactive Terminal menu to terminate, reactivate, or launch cleanly.
 - **Dual Display Modes**:
   - **Extended Display Mode**: Functions as an independent secondary workspace to extend desktop real estate.
   - **Mirror Display Mode**: Duplicates the primary macOS desktop onto the iOS device.
@@ -76,7 +79,7 @@ Developed and maintained by **[YoiKut.com](https://yoikut.com)**.
 ## Installation Guide
 
 ### Method 1: DMG Installer (Recommended)
-1. Download the latest installer package `iPhoneExtendedDisplay-1.0.1.dmg` from [GitHub Releases](https://github.com/omandstudio/iPhoneExtendedDisplay/releases).
+1. Download the latest installer package `iPhoneExtendedDisplay-1.0.2.dmg` from [GitHub Releases](https://github.com/omandstudio/iPhoneExtendedDisplay/releases).
 2. Double-click the downloaded `.dmg` file to mount the disk image.
 3. Drag the `iPhone Extended Display` application icon into the `Applications` shortcut folder.
 4. Launch the application directly from your `Applications` folder, Launchpad, or Spotlight.
@@ -173,7 +176,10 @@ To remove the application from your Mac:
 
 ## Fitur Utama
 
+- **Ikon Aplikasi Resmi macOS-iPhone**: Dilengkapi ikon resmi Apple squircle beresolusi tinggi (`AppIcon.icns`) yang menampilkan MacBook terhubung dengan iPhone melalui transmisi energi bercahaya.
 - **Jendela Kontrol Native macOS**: Antarmuka berbasis SwiftUI dan AppKit untuk memantau status server secara langsung, melihat alamat IP aktif, menyalin URL akses, dan mengatur frame rate.
+- **Manajemen Daya & Startup**: Pengaturan buka otomatis saat Mac dinyalakan (secara default nonaktif demi efisiensi daya & memori), tombol 1-klik "Matikan & Keluar Aplikasi" pada jendela kontrol, serta penutupan otomatis saat jendela ditutup.
+- **Peluncur Proses Cerdas (`Start-iPhoneExtendedDisplay.command`)**: Mendeteksi proses yang sedang berjalan dan menyediakan menu interaktif di Terminal untuk mematikan aplikasi, memunculkan kembali jendela kontrol, atau keluar.
 - **Dua Mode Tampilan**:
   - **Extended Display (Layar Tambahan)**: Berfungsi sebagai monitor kedua mandiri untuk memperluas area multitasking.
   - **Mirror Display (Duplikasi Layar)**: Menduplikasi tampilan layar utama Mac ke perangkat iOS.
@@ -204,7 +210,7 @@ To remove the application from your Mac:
 ## Panduan Instalasi
 
 ### Metode 1: Installer .DMG (Rekomendasi)
-1. Unduh file installer `iPhoneExtendedDisplay-1.0.1.dmg` dari halaman [GitHub Releases](https://github.com/omandstudio/iPhoneExtendedDisplay/releases).
+1. Unduh file installer `iPhoneExtendedDisplay-1.0.2.dmg` dari halaman [GitHub Releases](https://github.com/omandstudio/iPhoneExtendedDisplay/releases).
 2. Klik ganda file `.dmg` yang telah diunduh.
 3. Geser ikon aplikasi `iPhone Extended Display` ke dalam folder shortcut `Applications`.
 4. Buka aplikasi dari folder `Applications`, Launchpad, atau Spotlight.

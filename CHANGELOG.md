@@ -6,6 +6,28 @@ Format changelog ini mengacu pada [Keep a Changelog](https://keepachangelog.com/
 
 ---
 
+## [1.0.2] - 2026-11-18
+
+### Ditambahkan (Added)
+- **Ikon Aplikasi Resmi macOS-iPhone (`AppIcon.icns`)**:
+  - Penambahan ikon grafis resmi bergaya *macOS squircle* beresolusi tinggi (Retina hingga 1024x1024) yang menggambarkan MacBook terhubung dengan iPhone melalui transmisi energi bercahaya.
+  - Pemasangan otomatis ikon pada bundle aplikasi `.app`, jendela kontrol pop-up, serta installer `.dmg`.
+- **Manajemen Mulai Otomatis (Launch at Startup/Login)**:
+  - Aplikasi secara bawaan (*default*) berstatus **Nonaktif** saat macOS baru pertama kali dinyalakan untuk menghemat baterai dan memori.
+  - Penambahan toggle switch di jendela pengaturan pop-up untuk mematikan atau mengaktifkan fitur buka otomatis saat login.
+- **Tombol Matikan & Keluar Aplikasi (Power Management)**:
+  - Penambahan tombol khusus berwarna merah **"Matikan & Keluar Aplikasi"** pada jendela kontrol pop-up untuk menghentikan server dan menutup aplikasi secara instan dan bersih.
+  - Penambahan tombol **"Jeda Layanan / Aktifkan Layanan"** untuk menghentikan sementara penyiaran tanpa menutup aplikasi.
+  - Penyesuaian `applicationShouldTerminateAfterLastWindowClosed = true` sehingga menutup jendela pop-up (tombol merah X) otomatis mematikan aplikasi seutuhnya.
+- **Pendeteksi Proses Cerdas pada [Start-iPhoneExtendedDisplay.command](Start-iPhoneExtendedDisplay.command)**:
+  - Kemampuan mendeteksi instans aplikasi yang sedang berjalan dengan opsi menu Terminal untuk mematikan proses, memunculkan kembali jendela pop-up, atau keluar.
+
+### Diubah (Changed)
+- Peningkatan versi aplikasi dan bundle identitas menjadi `1.0.2` (Build 3).
+- Pembaruan paket installer mandiri menjadi `iPhoneExtendedDisplay-1.0.2.dmg`.
+
+---
+
 ## [1.0.1] - 2026-11-17
 
 ### Ditambahkan (Added)
