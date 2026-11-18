@@ -300,7 +300,7 @@ public struct WebClientHTML {
     </div>
 
     <!-- Badge HUD: Kecil & Otomatis Sembunyi -->
-    <div id="hud">60 FPS • Terhubung</div>
+    <div id="hud">Menyambungkan...</div>
 
     <!-- Tombol Pemicu Menu Mini (Hanya sebuah titik kecil di pojok kanan bawah) -->
     <div id="toggle-menu-btn" onclick="toggleMenu()" title="Pengaturan">⚙</div>
@@ -342,7 +342,7 @@ public struct WebClientHTML {
     <!-- Welcome Overlay -->
     <div id="overlay">
         <div class="card">
-            <span class="badge">● Terhubung</span>
+            <span class="badge" id="connBadge">● Siap Digunakan</span>
             <h1>iPhone XR Extended Monitor</h1>
             <p>Jadikan iPhone Anda sebagai monitor kedua untuk Mac Anda.</p>
             <button class="btn" id="startBtn" onclick="startStream()">Mulai Layar Tambahan</button>
@@ -367,6 +367,9 @@ public struct WebClientHTML {
         let lastFpsUpdate = performance.now();
         let isFillMode = false;
         let hideTimeout = null;
+        let isDecoding = false;
+        let latestBuffer = null;
+        let hasReceivedFirstFrame = false;
 
         function startStream() {
             overlay.style.opacity = '0';
@@ -375,10 +378,11 @@ public struct WebClientHTML {
             // Auto-scroll to collapse Safari address bar
             window.scrollTo(0, 1);
 
-            // Tampilkan HUD dan kontrol sebentar selama 2.5 detik lalu sembunyikan otomatis
             showControlsTemporarily(2500);
 
-            connectWebSocket();
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                connectWebSocket();
+            }
         }
 
         // Tampilkan kontrol sementara (auto-hide)
@@ -413,6 +417,13 @@ public struct WebClientHTML {
             const wsProto = loc.protocol === 'https:' ? 'wss:' : 'ws:';
             const wsUrl = `${wsProto}//${loc.host}/ws`;
 
+            if (ws) {
+                try { ws.close(); } catch(e) {}
+            }
+
+            hud.style.color = '#ff9500';
+            hud.innerText = 'Menyambungkan...';
+
             ws = new WebSocket(wsUrl);
             ws.binaryType = 'arraybuffer';
 
@@ -420,6 +431,14 @@ public struct WebClientHTML {
                 const scale = window.devicePixelRatio || 2.0;
                 const width = Math.round(window.innerWidth);
                 const height = Math.round(window.innerHeight);
+
+                hud.style.color = '#34c759';
+                hud.innerText = 'Terhubung • Menunggu Sinyal...';
+                const badge = document.getElementById('connBadge');
+                if (badge) {
+                    badge.innerText = '● Terhubung Aktif';
+                    badge.style.color = '#34c759';
+                }
 
                 ws.send(JSON.stringify({
                     type: 'handshake',
@@ -433,19 +452,48 @@ public struct WebClientHTML {
             ws.onmessage = (event) => {
                 if (event.data instanceof ArrayBuffer) {
                     renderFrame(event.data);
+                } else if (typeof event.data === 'string') {
+                    try {
+                        const msg = JSON.parse(event.data);
+                        if (msg.type === 'permission_needed') {
+                            hud.style.color = '#ff3b30';
+                            hud.innerText = 'Izin Layar Mac Diperlukan!';
+                            showControlsTemporarily(8000);
+                            alert('Izin Perekaman Layar (Screen Recording) belum aktif di Mac Anda. Silakan buka System Settings > Privacy & Security > Screen Recording dan berikan izin pada aplikasi iPhone Extended Display.');
+                        }
+                    } catch(e) {}
                 }
+            };
+
+            ws.onerror = () => {
+                hud.style.color = '#ff3b30';
+                hud.innerText = 'Gagal Tersambung';
             };
 
             ws.onclose = () => {
                 hud.style.color = '#ff9500';
-                hud.innerText = 'Menyambung ulang...';
+                hud.innerText = 'Menyambung Ulang...';
                 showControlsTemporarily(3000);
                 setTimeout(connectWebSocket, 1500);
             };
         }
 
         function renderFrame(arrayBuffer) {
-            const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+            latestBuffer = arrayBuffer;
+            if (isDecoding) return;
+            processNextFrame();
+        }
+
+        function processNextFrame() {
+            if (!latestBuffer) {
+                isDecoding = false;
+                return;
+            }
+            isDecoding = true;
+            const buffer = latestBuffer;
+            latestBuffer = null;
+
+            const blob = new Blob([buffer], { type: 'image/jpeg' });
             
             if (window.createImageBitmap) {
                 createImageBitmap(blob).then(bitmap => {
@@ -455,7 +503,12 @@ public struct WebClientHTML {
                     }
                     ctx.drawImage(bitmap, 0, 0);
                     bitmap.close();
+                    if (!hasReceivedFirstFrame) {
+                        hasReceivedFirstFrame = true;
+                        overlay.style.display = 'none';
+                    }
                     updateFps();
+                    processNextFrame();
                 }).catch(() => fallbackRender(blob));
             } else {
                 fallbackRender(blob);
@@ -472,9 +525,30 @@ public struct WebClientHTML {
                 }
                 ctx.drawImage(img, 0, 0);
                 URL.revokeObjectURL(url);
+                if (!hasReceivedFirstFrame) {
+                    hasReceivedFirstFrame = true;
+                    overlay.style.display = 'none';
+                }
                 updateFps();
+                processNextFrame();
+            };
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                processNextFrame();
             };
             img.src = url;
+        }
+
+        // Auto start if launched as standalone Home Screen app or automatically initiate ws
+        if (window.navigator.standalone) {
+            window.addEventListener('DOMContentLoaded', () => {
+                setTimeout(startStream, 200);
+            });
+        } else {
+            // Auto-connect socket in background so initial frames arrive before click
+            window.addEventListener('DOMContentLoaded', () => {
+                connectWebSocket();
+            });
         }
 
         function updateFps() {

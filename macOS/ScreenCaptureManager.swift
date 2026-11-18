@@ -23,6 +23,8 @@ public class ScreenCaptureManager: NSObject, SCStreamOutput, SCStreamDelegate {
     private let captureQueue = DispatchQueue(label: "com.openextended.captureQueue", qos: .userInteractive)
     
     private var fallbackTimer: DispatchSourceTimer?
+    private var idleWatchdogTimer: DispatchSourceTimer?
+    private var lastFrameTime: CFAbsoluteTime = 0
     private var targetDisplayID: CGDirectDisplayID = 0
     private var permissionPollTimer: Timer?
     
@@ -82,11 +84,42 @@ public class ScreenCaptureManager: NSObject, SCStreamOutput, SCStreamDelegate {
             try await newStream.startCapture()
             self.stream = newStream
             self.isCapturing = true
+            self.lastFrameTime = CFAbsoluteTimeGetCurrent()
+            self.startIdleWatchdog()
             print("[Capture] ✅ ScreenCaptureKit active on display \(display.displayID) (\(config.width)x\(config.height) @ \(fps)fps)")
+            
+            // Immediately force an initial frame capture
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                self?.forceCaptureFrame()
+            }
         } catch {
             print("[Capture] ⚠️ ScreenCaptureKit failed (\(error.localizedDescription)). Using CoreGraphics fallback...")
             startFallbackCapture(displayID: displayID, fps: fps)
         }
+    }
+    
+    public func forceCaptureFrame() {
+        guard CGPreflightScreenCaptureAccess() else { return }
+        let id = self.targetDisplayID != 0 ? self.targetDisplayID : CGMainDisplayID()
+        if let image = CGDisplayCreateImage(id) {
+            self.lastFrameTime = CFAbsoluteTimeGetCurrent()
+            self.delegate?.captureManager(self, didCaptureCGImage: image)
+        }
+    }
+    
+    private func startIdleWatchdog() {
+        idleWatchdogTimer?.cancel()
+        let timer = DispatchSource.makeTimerSource(queue: captureQueue)
+        timer.schedule(deadline: .now() + 0.5, repeating: 0.5)
+        timer.setEventHandler { [weak self] in
+            guard let self = self, self.isCapturing else { return }
+            let now = CFAbsoluteTimeGetCurrent()
+            if now - self.lastFrameTime >= 0.8 {
+                self.forceCaptureFrame()
+            }
+        }
+        timer.resume()
+        self.idleWatchdogTimer = timer
     }
     
     private func startFallbackCapture(displayID: CGDirectDisplayID, fps: Int) {
@@ -101,12 +134,7 @@ public class ScreenCaptureManager: NSObject, SCStreamOutput, SCStreamDelegate {
         
         timer.setEventHandler { [weak self] in
             guard let self = self else { return }
-            guard CGPreflightScreenCaptureAccess() else { return }
-            
-            let id = self.targetDisplayID != 0 ? self.targetDisplayID : CGMainDisplayID()
-            if let image = CGDisplayCreateImage(id) {
-                self.delegate?.captureManager(self, didCaptureCGImage: image)
-            }
+            self.forceCaptureFrame()
         }
         
         timer.resume()
@@ -116,6 +144,9 @@ public class ScreenCaptureManager: NSObject, SCStreamOutput, SCStreamDelegate {
     }
     
     public func stopCapture() {
+        idleWatchdogTimer?.cancel()
+        idleWatchdogTimer = nil
+        
         fallbackTimer?.cancel()
         fallbackTimer = nil
         
@@ -134,6 +165,7 @@ public class ScreenCaptureManager: NSObject, SCStreamOutput, SCStreamDelegate {
             return
         }
         
+        self.lastFrameTime = CFAbsoluteTimeGetCurrent()
         let pts = sampleBuffer.presentationTimeStamp
         delegate?.captureManager(self, didCapturePixelBuffer: imageBuffer, timestamp: pts)
     }

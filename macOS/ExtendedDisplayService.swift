@@ -71,6 +71,11 @@ public class ExtendedDisplayService: NetworkServerDelegate, H264EncoderDelegate,
         let fps = AppState.shared.targetFps
         
         setupDisplayAndCapture(targetWidth: targetWidth, targetHeight: targetHeight, fps: fps, isHiDPI: scale >= 2.0)
+        
+        // Immediately force an initial frame capture to send to iPhone Safari
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.screenCaptureManager.forceCaptureFrame()
+        }
     }
     
     public func webServer(_ server: WebServer, didReceiveTouch phase: UInt8, x: Double, y: Double, isRightClick: Bool) {

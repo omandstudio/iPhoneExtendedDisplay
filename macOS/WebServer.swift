@@ -15,6 +15,7 @@ public class WebServer {
     
     private var listener: NWListener?
     private var activeWsConnection: NWConnection?
+    private var lastSentJpegData: Data?
     private let queue = DispatchQueue(label: "com.openextended.webserver", qos: .userInteractive)
     
     private let ciContext = CIContext(options: [.useSoftwareRenderer: false])
@@ -80,18 +81,21 @@ public class WebServer {
                 return
             }
             
-            // Check if WebSocket upgrade request
-            if requestStr.contains("Upgrade: websocket") || requestStr.contains("upgrade: websocket") {
+            // Check if WebSocket upgrade request (case-insensitive check RFC 6455)
+            let lower = requestStr.lowercased()
+            let isWsUpgrade = (lower.contains("upgrade") && lower.contains("websocket")) || lower.contains("sec-websocket-key")
+            
+            if isWsUpgrade {
                 self.handleWebSocketUpgrade(connection: connection, request: requestStr)
             } else {
-                // Regular HTTP GET request - serve the Web Client HTML/JS
+                // Regular HTTP GET request - serve the Web Client HTML/JS or Web Icons
                 self.serveHttpPage(connection: connection, request: requestStr)
             }
         }
     }
     
     private func serveHttpPage(connection: NWConnection, request: String) {
-        let firstLine = request.components(separatedBy: "\r\n").first ?? ""
+        let firstLine = request.components(separatedBy: "\r\n").first?.lowercased() ?? ""
         
         // Serve Web Icon & Favicon for iOS Safari Bookmarks / Add to Home Screen
         if firstLine.contains("favicon") || firstLine.contains("apple-touch-icon") || firstLine.contains("icon.png") {
@@ -128,10 +132,11 @@ public class WebServer {
     private func handleWebSocketUpgrade(connection: NWConnection, request: String) {
         // Extract Sec-WebSocket-Key
         guard let keyLine = request.components(separatedBy: "\r\n").first(where: { $0.lowercased().hasPrefix("sec-websocket-key:") }),
-              let clientKey = keyLine.components(separatedBy: ":").last?.trimmingCharacters(in: .whitespaces) else {
+              let colonIdx = keyLine.firstIndex(of: ":") else {
             connection.cancel()
             return
         }
+        let clientKey = keyLine[keyLine.index(after: colonIdx)...].trimmingCharacters(in: .whitespaces)
         
         // Compute Sec-WebSocket-Accept
         let magic = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
@@ -159,6 +164,11 @@ public class WebServer {
             self.activeWsConnection?.cancel()
             self.activeWsConnection = connection
             self.readWebSocketFrames(connection: connection)
+            
+            // Deliver last captured frame immediately so screen never stays black
+            if let cached = self.lastSentJpegData {
+                self.sendWsBinaryData(cached)
+            }
         }))
     }
     
@@ -267,16 +277,20 @@ public class WebServer {
         
         switch type {
         case "handshake":
-            let width = UInt32(dict["width"] as? Double ?? 896.0)
-            let height = UInt32(dict["height"] as? Double ?? 414.0)
-            let scale = dict["scale"] as? Double ?? 2.0
+            let widthNum = (dict["width"] as? NSNumber)?.doubleValue ?? (dict["width"] as? Double ?? 896.0)
+            let heightNum = (dict["height"] as? NSNumber)?.doubleValue ?? (dict["height"] as? Double ?? 414.0)
+            let scaleNum = (dict["scale"] as? NSNumber)?.doubleValue ?? (dict["scale"] as? Double ?? 2.0)
+            
+            let width = UInt32(widthNum)
+            let height = UInt32(heightNum)
+            let scale = scaleNum
             print("[WebServer] 📱 Safari Handshake: \(width)x\(height) @\(scale)x")
             delegate?.webServer(self, didClientHandshake: width, height: height, scale: scale)
             
         case "touch":
-            let phase = UInt8(dict["phase"] as? Int ?? 1)
-            let x = dict["x"] as? Double ?? 0.0
-            let y = dict["y"] as? Double ?? 0.0
+            let phase = UInt8((dict["phase"] as? NSNumber)?.intValue ?? (dict["phase"] as? Int ?? 1))
+            let x = (dict["x"] as? NSNumber)?.doubleValue ?? (dict["x"] as? Double ?? 0.0)
+            let y = (dict["y"] as? NSNumber)?.doubleValue ?? (dict["y"] as? Double ?? 0.0)
             let right = dict["rightClick"] as? Bool ?? false
             delegate?.webServer(self, didReceiveTouch: phase, x: x, y: y, isRightClick: right)
             
@@ -330,6 +344,7 @@ public class WebServer {
             return
         }
         
+        self.lastSentJpegData = jpegData
         sendWsBinaryData(jpegData)
     }
     
@@ -353,6 +368,7 @@ public class WebServer {
             return
         }
         
+        self.lastSentJpegData = jpegData
         sendWsBinaryData(jpegData)
     }
     
